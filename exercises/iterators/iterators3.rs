@@ -9,8 +9,6 @@
 // Execute `rustlings hint iterators3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 #[derive(Debug, PartialEq, Eq)]
 pub enum DivisionError {
     NotDivisible(NotDivisibleError),
@@ -26,23 +24,51 @@ pub struct NotDivisibleError {
 // Calculate `a` divided by `b` if `a` is evenly divisible by `b`.
 // Otherwise, return a suitable error.
 pub fn divide(a: i32, b: i32) -> Result<i32, DivisionError> {
-    todo!();
+    // todo!();
+    if b == 0 {
+        return Err(DivisionError::DivideByZero);
+    } else if a % b != 0 {
+        return Err(DivisionError::NotDivisible(NotDivisibleError{dividend:a, divisor:b}));
+    }
+
+    Ok(a/b)
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: Ok([1, 11, 1426, 3])
-fn result_with_list() -> () {
+fn result_with_list<const N: usize>() -> Result<[i32;N], DivisionError> {
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let mut division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let mut results:[i32;N] = [0;N];
+    let mut index = 0;
+    let mut i_result = division_results.next();
+    while i_result != None {
+        results[index] = i_result.unwrap().unwrap();
+        i_result = division_results.next();
+        index += 1;
+    }
+
+    Ok(results)
 }
 
 // Complete the function and return a value of the correct type so the test
 // passes.
 // Desired output: [Ok(1), Ok(11), Ok(1426), Ok(3)]
-fn list_of_results() -> () {
+fn list_of_results<const N: usize>() -> [Result<i32, DivisionError>;N] {
     let numbers = vec![27, 297, 38502, 81];
-    let division_results = numbers.into_iter().map(|n| divide(n, 27));
+    let mut division_results = numbers.into_iter().map(|n| divide(n, 27));
+    const ARRAY_REPEAT_VALUE: Result<i32, DivisionError> = Ok(0);
+    let mut results = [ARRAY_REPEAT_VALUE;N];
+    let mut index = 0;
+    let mut i_result = division_results.next();
+    while i_result != None {
+        results[index] = i_result.unwrap();
+        i_result = division_results.next();
+        index += 1;
+    }
+
+    results
 }
 
 #[cfg(test)]
@@ -77,13 +103,13 @@ mod tests {
 
     #[test]
     fn test_result_with_list() {
-        assert_eq!(format!("{:?}", result_with_list()), "Ok([1, 11, 1426, 3])");
+        assert_eq!(format!("{:?}", result_with_list::<4>()), "Ok([1, 11, 1426, 3])");
     }
 
     #[test]
     fn test_list_of_results() {
         assert_eq!(
-            format!("{:?}", list_of_results()),
+            format!("{:?}", list_of_results::<4>()),
             "[Ok(1), Ok(11), Ok(1426), Ok(3)]"
         );
     }
