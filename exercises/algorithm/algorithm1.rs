@@ -2,9 +2,8 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{self, Display, Formatter, Debug};
 use std::ptr::NonNull;
 use std::vec::*;
 
@@ -29,13 +28,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd + Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -72,11 +71,47 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
+        let mut result = LinkedList {
             length: 0,
             start: None,
             end: None,
+        };
+
+        let mut list_a = list_a;
+        let mut list_b = list_b;
+        let mut index_a: i32 = 0;
+        let mut index_b: i32 = 0;
+        while (index_a as u32) < list_a.length && (index_b as u32) < list_b.length {
+            let result_a = (*list_a.get(index_a).unwrap()).clone();
+            let result_b = (*list_b.get(index_b).unwrap()).clone();
+            if result_a <= result_b {
+                result.add(result_a);
+                index_a += 1;
+            } else {
+                result.add(result_b);
+                index_b += 1;
+            }     
         }
+
+        if (index_a as u32) < list_a.length {
+            while (index_a as u32) < list_a.length {
+                let result_a = (*list_a.get(index_a).unwrap()).clone();
+                result.add(result_a);
+                index_a += 1;
+            }
+        } else {
+            while (index_b as u32) < list_b.length {
+                let result_b = (*list_b.get(index_b).unwrap()).clone();
+                result.add(result_b);
+                index_b += 1;
+            }
+        }
+
+        Self {
+            length: result.length,
+            start: result.start,
+            end: result.end,
+        }        
 	}
 }
 

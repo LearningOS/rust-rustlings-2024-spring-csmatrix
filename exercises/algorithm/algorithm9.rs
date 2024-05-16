@@ -1,8 +1,7 @@
 /*
 	heap
-	This question requires you to implement a binary heap function
+	This question requires you to implement a binary heap function.
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -38,10 +37,30 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        if self.count == 0 {
+            self.items.clear();
+        }
+
+        self.items.push(value);
+        self.count += 1;
+
+        let mut p_idx = self.parent_idx(self.count - 1);
+        let mut c_idx = self.count - 1;
+        while (self.comparator)(&self.items[c_idx], &self.items[p_idx]) {
+            self.items.swap(p_idx, c_idx);
+            c_idx = p_idx;
+            p_idx = self.parent_idx(p_idx);
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
-        idx / 2
+        if idx == 0 {
+            0
+        } else if idx % 2 == 0 {
+            (idx - 1) / 2
+        } else {
+            idx / 2
+        }
     }
 
     fn children_present(&self, idx: usize) -> bool {
@@ -58,7 +77,15 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        let out_index = self.count / 2;
+        let mut result = out_index;
+        for i in (out_index + 1)..self.count {
+            if (self.comparator)(&self.items[i], &self.items[result]) {
+                result = i;
+            }
+        }
+
+        result
     }
 }
 
@@ -85,7 +112,13 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if !self.is_empty() {
+			self.count -= 1;
+            Some(self.items.remove(0usize))
+		} 
+		else {
+			None
+		}
     }
 }
 

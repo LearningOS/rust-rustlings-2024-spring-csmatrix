@@ -3,15 +3,14 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct TreeNode<T>
 where
-    T: Ord,
+    T: Ord + std::clone::Clone,
 {
     value: T,
     left: Option<Box<TreeNode<T>>>,
@@ -21,14 +20,14 @@ where
 #[derive(Debug)]
 struct BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + std::clone::Clone,
 {
     root: Option<Box<TreeNode<T>>>,
 }
 
 impl<T> TreeNode<T>
 where
-    T: Ord,
+    T: Ord + std::clone::Clone,
 {
     fn new(value: T) -> Self {
         TreeNode {
@@ -41,7 +40,7 @@ where
 
 impl<T> BinarySearchTree<T>
 where
-    T: Ord,
+    T: Ord + std::clone::Clone,
 {
 
     fn new() -> Self {
@@ -51,22 +50,54 @@ where
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
         //TODO
+        if self.root.is_none() {
+            let root_node = TreeNode::<T>::new(value);
+            self.root = Some(Box::new(root_node));
+        } else {
+            self.root.as_mut().unwrap().insert(value);
+        }       
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
         //TODO
-        true
+        if self.root.is_none() {
+            false
+        } else {
+            let val = &(*self.root.as_ref().unwrap()).value;
+            if value < *val {
+                (BinarySearchTree { root: (*self.root.clone().unwrap()).left }).search(value)
+            } else if value == *val {
+                true
+            } else {
+                (BinarySearchTree { root: (*self.root.clone().unwrap()).right }).search(value)
+            }
+        }
     }
 }
 
 impl<T> TreeNode<T>
 where
-    T: Ord,
+    T: Ord + std::clone::Clone,
 {
     // Insert a node into the tree
     fn insert(&mut self, value: T) {
         //TODO
+        if value < self.value {
+            if self.left.is_none() {
+                self.left = Some(Box::new(TreeNode::<T>::new(value)));
+            } else {
+                self.left.as_mut().unwrap().insert(value);
+            }
+        } else if self.value == value {
+            return;
+        } else {
+            if self.right.is_none() {
+                self.right = Some(Box::new(TreeNode::<T>::new(value)));
+            } else {
+                self.right.as_mut().unwrap().insert(value);
+            }
+        }
     }
 }
 
@@ -121,6 +152,4 @@ mod tests {
             None => panic!("Root should not be None after insertion"),
         }
     }
-}    
-
-
+}
